@@ -1,0 +1,19 @@
+---
+services:
+  wordcount-default:
+    build: .
+    container_name: wordcount-default
+    depends_on:
+      - broker
+    command: studio.goodlabs.WordCountStreamDefaultApp
+    environment:
+      BOOTSTRAP_SERVERS: broker:29092
+
+#  wordcount-optimized:
+#    build: .
+#    container_name: wordcount-optimized
+#    depends_on:
+#      - broker
+#    command: studio.goodlabs.WordCountStreamOptimizedApp
+#    environment:
+#      BOOTSTRAP_SERVERS: broker:29092
