@@ -10,13 +10,14 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.state.KeyValueStore;
 import java.lang.System;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class WordCountStreamDefaultApp {
-    private static final String BOOTSTRAP_SERVERS = System.getenv("BOOTSTRAP_SERVERS");
+public class WordCountStreamApp {
+    private static final String BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
 
     public static void main(String[] args) {
         Properties props = new Properties();
@@ -24,8 +25,6 @@ public class WordCountStreamDefaultApp {
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         props.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, 1);
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 1000);
-        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG,   Serdes.String().getClass().getName());
-        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
 
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> textLines = builder.stream(
@@ -36,8 +35,12 @@ public class WordCountStreamDefaultApp {
         KTable<String, Long> wordCounts = textLines
                 .flatMapValues(value -> Arrays.asList(value.toLowerCase().split("\\W+")))
                 .filter((key, word) -> !word.isEmpty())
-                .groupBy((key, word) -> word)
-                .count(Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("counts-store"));
+                .groupBy((key, word) -> word, Grouped.with(Serdes.String(), Serdes.String()))
+                .count(
+                        Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("counts-store")
+                            .withKeySerde(Serdes.String())
+                            .withValueSerde(Serdes.Long())
+                );
 
         wordCounts
                 .toStream()

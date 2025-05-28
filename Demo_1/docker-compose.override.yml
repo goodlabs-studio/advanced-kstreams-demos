@@ -1,0 +1,12 @@
+---
+services:
+  broker:
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_JMX_PORT: 7071
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_OPTS: -javaagent:/usr/share/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=1234:/usr/share/jmx_exporter/kafka-broker.yml
+    volumes:
+      - ../jmx-exporter:/usr/share/jmx_exporter/

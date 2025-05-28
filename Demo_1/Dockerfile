@@ -14,6 +14,4 @@ COPY --from=builder /workspace/target/kstreams-wordcount-1.0-SNAPSHOT.jar app.ja
 
 EXPOSE 7071
 
-ENTRYPOINT ["java", "-cp", "/app/app.jar"]
-
-CMD ["-version"]
+ENTRYPOINT java $JAVA_OPTS -Dlogback.configurationFile="/app/resources/logback.xml" -cp /app/app.jar studio.goodlabs.WordCountStreamApp

@@ -1,19 +1,25 @@
----
+volumes:
+  streams-state:
+
 services:
-  wordcount-default:
+  streams:
     build: .
-    container_name: wordcount-default
     depends_on:
       - broker
-    command: studio.goodlabs.WordCountStreamDefaultApp
+      - schema-registry
     environment:
-      BOOTSTRAP_SERVERS: broker:29092
+      KAFKA_BOOTSTRAP_SERVERS: broker:29092
+      KAFKA_METRICS_RECORDING_LEVEL: "DEBUG"
+      JAVA_OPTS: -javaagent:/usr/share/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=1234:/usr/share/jmx_exporter/kafka-streams-post-2.5.yml -Xmx256M -Xms256M
+    volumes:
+      - streams-state:/tmp/kafka-streams
+      - ../jmx-exporter:/usr/share/jmx_exporter/
 
-#  wordcount-optimized:
-#    build: .
-#    container_name: wordcount-optimized
-#    depends_on:
-#      - broker
-#    command: studio.goodlabs.WordCountStreamOptimizedApp
-#    environment:
-#      BOOTSTRAP_SERVERS: broker:29092
+  rocksdb-tools:
+    image: abicky/rocksdb-tools
+    entrypoint: [ "/usr/local/bin/ldb" ]
+    command:
+      - "--db=/tmp/kafka-streams/wordcount-optimized-app/1_0/rocksdb/counts-store"
+      - "info OPTIONS-*"
+    volumes:
+      - streams-state:/tmp/kafka-streams

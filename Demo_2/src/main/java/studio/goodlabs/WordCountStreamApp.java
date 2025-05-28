@@ -10,18 +10,21 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.RocksDBConfigSetter;
 import org.rocksdb.Options;
 import org.rocksdb.CompactionStyle;
+import org.rocksdb.InfoLogLevel;
 import org.rocksdb.RocksDB;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
-public class WordCountStreamOptimizedApp {
-    private static final String BOOTSTRAP_SERVERS = System.getenv("BOOTSTRAP_SERVERS");
+public class WordCountStreamApp {
+    private static final String BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
 
     public static class OptimizedRocksDBConfig implements RocksDBConfigSetter {
         static { RocksDB.loadLibrary(); }
@@ -31,11 +34,11 @@ public class WordCountStreamOptimizedApp {
             // Lower space amplification
             options.setCompactionStyle(CompactionStyle.LEVEL);
             // Prevent OOM: smaller memtables
-            options.setWriteBufferSize(8 * 1024 * 1024);       // 8 MB
-            options.setMaxWriteBufferNumber(2);                // 2 buffers
+            options.setWriteBufferSize(8 * 1024 * 1024); // 8 MB
+            options.setMaxWriteBufferNumber(2); // 2 buffers
             // Limit threads to reduce I/O/CPU contention
-            options.setMaxBackgroundCompactions(1);            // 1 compaction thread
-            options.setMaxBackgroundFlushes(1);                // 1 flush thread
+            options.setMaxBackgroundCompactions(1); // 1 compaction thread
+            options.setMaxBackgroundFlushes(1); // 1 flush thread
         }
 
         @Override
@@ -46,11 +49,13 @@ public class WordCountStreamOptimizedApp {
         Properties props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "wordcount-optimized-app");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        props.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, 1); // limit cores :contentReference[oaicite:14]{index=14}
+        props.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, 1);
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 1000);
-        // Hook in our RocksDBConfigSetter
-        props.put(StreamsConfig.ROCKSDB_CONFIG_SETTER_CLASS_CONFIG,
-                OptimizedRocksDBConfig.class.getName());
+        // Hook in the RocksDBConfigSetter
+        props.put(
+                StreamsConfig.ROCKSDB_CONFIG_SETTER_CLASS_CONFIG,
+                OptimizedRocksDBConfig.class.getName()
+        );
 
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> textLines = builder.stream(
@@ -60,8 +65,13 @@ public class WordCountStreamOptimizedApp {
 
         KTable<String, Long> wordCounts = textLines
                 .flatMapValues(value -> Arrays.asList(value.toLowerCase().split("\\W+")))
-                .groupBy((key, word) -> word)
-                .count(Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("counts-store"));
+                .filter((key, word) -> !word.isEmpty())
+                .groupBy((key, word) -> word, Grouped.with(Serdes.String(), Serdes.String()))
+                .count(
+                        Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("counts-store")
+                                .withKeySerde(Serdes.String())
+                                .withValueSerde(Serdes.Long())
+                );
 
         wordCounts
                 .toStream()
