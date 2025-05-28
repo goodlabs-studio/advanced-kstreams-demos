@@ -5,19 +5,13 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.state.KeyValueStore;
-import org.apache.kafka.streams.state.StoreBuilder;
-import org.apache.kafka.streams.state.Stores;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Properties;
 
 public class OrderProcessorApp {
     private static final String RAW_ORDER_TOPIC = "raw-order-topic";
     private static final String CLEAN_ORDER_TOPIC = "clean-order-topic";
-    private static final String STORE_NAME = "seen-store";
-    private static final long STORE_TTL_MS = Duration.ofMinutes(1).toMillis();
 
     private static final String BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
 
@@ -34,20 +28,8 @@ public class OrderProcessorApp {
         );
 
         StreamsBuilder builder = new StreamsBuilder();
-
-        StoreBuilder<KeyValueStore<String, Long>> seenStoreBuilder =
-                Stores.keyValueStoreBuilder(
-                        Stores.persistentKeyValueStore(STORE_NAME),
-                        Serdes.String(),
-                        Serdes.Long()
-                );
-        builder.addStateStore(seenStoreBuilder);
-
         KStream<String, String> orders = builder.stream(RAW_ORDER_TOPIC);
-        orders
-            .transform(() -> new DeduplicationTransformer(STORE_NAME, STORE_TTL_MS), STORE_NAME)
-            .filter((key, value) -> value != null) // deduplication returns null for dupes
-            .to(CLEAN_ORDER_TOPIC);
+        orders.to(CLEAN_ORDER_TOPIC);
 
         KafkaStreams streams = new KafkaStreams(builder.build(), props);
         streams.start();
