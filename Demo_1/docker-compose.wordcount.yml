@@ -1,6 +1,3 @@
-volumes:
-  streams-state:
-
 services:
   streams:
     build: .
@@ -9,17 +6,9 @@ services:
       - schema-registry
     environment:
       KAFKA_BOOTSTRAP_SERVERS: broker:29092
+      APPLICATION_ID: "word-count-app"
+      STORE_NAME: "counts-store"
       KAFKA_METRICS_RECORDING_LEVEL: "DEBUG"
       JAVA_OPTS: -javaagent:/usr/share/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=1234:/usr/share/jmx_exporter/kafka-streams-post-2.5.yml -Xmx256M -Xms256M
     volumes:
-      - streams-state:/tmp/kafka-streams
       - ../jmx-exporter:/usr/share/jmx_exporter/
-
-  rocksdb-tools:
-    image: abicky/rocksdb-tools
-    entrypoint: [ "/usr/local/bin/ldb" ]
-    command:
-      - "--db=/tmp/kafka-streams/wordcount-optimized-app/1_0/rocksdb/counts-store"
-      - "info OPTIONS-*"
-    volumes:
-      - streams-state:/tmp/kafka-streams

@@ -17,18 +17,23 @@ import java.util.Arrays;
 import java.util.Properties;
 
 public class WordCountStreamApp {
+    private static final String INPUT_TOPIC = "input-topic";
+    private static final String OUTPUT_TOPIC = "output-topic";
+
     private static final String BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
+    private static final String APPLICATION_ID = System.getenv("APPLICATION_ID");
+    private static final String STORE_NAME = System.getenv("STORE_NAME");
 
     public static void main(String[] args) {
         Properties props = new Properties();
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "wordcount-default-app");
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, APPLICATION_ID);
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         props.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, 1);
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 1000);
 
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> textLines = builder.stream(
-                "input-topic",
+                INPUT_TOPIC,
                 Consumed.with(Serdes.String(), Serdes.String())
         );
 
@@ -37,14 +42,14 @@ public class WordCountStreamApp {
                 .filter((key, word) -> !word.isEmpty())
                 .groupBy((key, word) -> word, Grouped.with(Serdes.String(), Serdes.String()))
                 .count(
-                        Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("counts-store")
+                        Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as(STORE_NAME)
                             .withKeySerde(Serdes.String())
                             .withValueSerde(Serdes.Long())
                 );
 
         wordCounts
                 .toStream()
-                .to("output-topic", Produced.with(Serdes.String(), Serdes.Long()));
+                .to(OUTPUT_TOPIC, Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), props);
         streams.start();
