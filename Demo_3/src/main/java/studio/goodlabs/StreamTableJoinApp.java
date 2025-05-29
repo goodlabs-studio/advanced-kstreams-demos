@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Properties;
 
 public class StreamTableJoinApp {
-    private static final String ORDER_TOPIC = "order-topic";
-    private static final String ADDRESS_TOPIC = "address-topic";
+    private static final String ORDER_TOPIC = "stream-table-order-topic";
+    private static final String ADDRESS_TOPIC = "stream-table-address-topic";
     private static final String OUTPUT_TOPIC = "stream-table-output-topic";
 
     private static final String BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");

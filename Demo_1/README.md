@@ -6,6 +6,10 @@ The purpose of this demo is to modify a simple streams application to edit the R
 
 ## Steps
 
+If you're coming from a previous demo, make sure to delete all containers and volumes from your previous experiments.
+This will keep each demo self-contained.
+Don't worry, none of the demos rely on the work we did in a previous demo.
+
 ### Run the WordCountStreamApp application
 
 The `WordCountStreamApp` is a simple streams application that consumes from a topic called `output-topic` and counts the number of times a given word has appeared.

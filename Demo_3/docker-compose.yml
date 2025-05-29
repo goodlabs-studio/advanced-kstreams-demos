@@ -51,11 +51,17 @@ services:
     # See https://docs.docker.com/compose/startup-order/
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
                        cub kafka-ready -b broker:29092 1 20 && \
-                       kafka-topics --create --topic order-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
-                       kafka-topics --create --topic address-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic stream-stream-order-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic stream-stream-address-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
                        kafka-topics --create --topic stream-stream-output-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic stream-table-order-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic stream-table-address-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
                        kafka-topics --create --topic stream-table-output-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic table-table-order-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic table-table-address-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
                        kafka-topics --create --topic table-table-output-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic stream-gtable-order-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic stream-gtable-address-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
                        kafka-topics --create --topic stream-gtable-output-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
                        sleep infinity'"
     environment:

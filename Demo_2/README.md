@@ -7,6 +7,10 @@ We'll be exposing our metrics through Grafana dashboards.
 
 ## Steps
 
+If you're coming from a previous demo, make sure to delete all containers and volumes from your previous experiments.
+This will keep each demo self-contained.
+Don't worry, none of the demos rely on the work we did in a previous demo.
+
 ### Create the Grafana service
 
 We want to monitor our metrics in a nice dashboard.
