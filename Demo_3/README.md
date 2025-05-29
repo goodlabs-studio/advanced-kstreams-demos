@@ -75,9 +75,11 @@ You can run this from any of the join applications, not just the stream-stream o
 
 > NOTE: You can generate a timestamp an arbitrary number of seconds in the past by running `timestamp=$(( $(date +%s000) - seconds*1000 ))`
 
+### Goals
+
 This demo is intended to give you free-reign to answer some questions on your own about how joins behave.
 
 Some questions I'd like you to explore:
 - Other than the latter not needing co-partitioning, how is a Stream-Table join different than a Stream-GlobalTable join? Do they behave differently when it comes to out-of-order messages? What impact could this have on a streaming application?
 - In a Stream-Stream join, is the windowing based on processing time (wallclock at the consumer), log-append time (when the message arrived at the broker), or the timestamp? What does this mean for out-of order messages?
-- When does a Table-Table join produce messages to its output topic in an inner join? Does it behave like a Stream-Stream inner join? If not, how is it different? What is the impact of out-of-order messages on a Table-Table join?
+- When does a Table-Table join produce messages to its output topic in an inner join? Does it behave like a Stream-Stream inner join? If not, how is it different? What is the impact of out-of-order messages on a Table-Table join, or a Table in general?

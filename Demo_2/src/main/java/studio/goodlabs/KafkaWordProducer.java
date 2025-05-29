@@ -15,12 +15,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class KafkaWordProducer {
-    public static void main(String[] args) throws Exception {
-        String bootstrapServers = System.getenv().getOrDefault("BOOTSTRAP_SERVERS", "localhost:9092");
-        String topic = System.getenv().getOrDefault("TOPIC", "input-topic");
+    private static final String OUTPUT_TOPIC = "input-topic";
 
+    private static final String BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
+
+    public static void main(String[] args) throws Exception {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
@@ -28,16 +29,16 @@ public class KafkaWordProducer {
 
         // Load words from resources/words.txt
         InputStream in = KafkaWordProducer.class
-                .getClassLoader()
-                .getResourceAsStream("words.txt");
+            .getClassLoader()
+            .getResourceAsStream("words.txt");
         List<String> words = new BufferedReader(new InputStreamReader(in))
-                .lines()
-                .collect(Collectors.toList());
+            .lines()
+            .collect(Collectors.toList());
 
         int index = 0;
         while (true) {
             String word = words.get(index);
-            ProducerRecord<String, String> record = new ProducerRecord<>(topic, word);
+            ProducerRecord<String, String> record = new ProducerRecord<>(OUTPUT_TOPIC, word);
             producer.send(record, (metadata, exception) -> {
                 if (exception != null) {
                     exception.printStackTrace();
