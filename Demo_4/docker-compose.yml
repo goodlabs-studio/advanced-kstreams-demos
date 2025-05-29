@@ -53,6 +53,9 @@ services:
                        cub kafka-ready -b broker:29092 1 20 && \
                        kafka-topics --create --topic raw-order-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
                        kafka-topics --create --topic clean-order-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic payments-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic shipping-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
+                       kafka-topics --create --topic joined-payment-shipment-topic --if-not-exists --bootstrap-server broker:29092 --partitions 4 --replication-factor 1 && \
                        sleep infinity'"
     environment:
       # The following settings are listed here only to satisfy the image's requirements.
@@ -144,5 +147,11 @@ services:
   order-processor:
     build: .
     command: ["studio.goodlabs.OrderProcessorApp"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: 'broker:29092'
+
+  payment-shipment-processor:
+    build: .
+    command: [ "studio.goodlabs.PaymentShipmentJoinApp" ]
     environment:
       KAFKA_BOOTSTRAP_SERVERS: 'broker:29092'
