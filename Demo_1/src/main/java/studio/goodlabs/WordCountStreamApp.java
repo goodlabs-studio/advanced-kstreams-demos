@@ -12,8 +12,11 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.state.KeyValueStore;
+
 import java.lang.System;
+
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 public class WordCountStreamApp {
@@ -31,25 +34,30 @@ public class WordCountStreamApp {
         props.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, 1);
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 1000);
 
+        DemoStreamsUtils.waitForTopics(
+            props,
+            List.of(INPUT_TOPIC, OUTPUT_TOPIC)
+        );
+
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> textLines = builder.stream(
-                INPUT_TOPIC,
-                Consumed.with(Serdes.String(), Serdes.String())
+            INPUT_TOPIC,
+            Consumed.with(Serdes.String(), Serdes.String())
         );
 
         KTable<String, Long> wordCounts = textLines
-                .flatMapValues(value -> Arrays.asList(value.toLowerCase().split("\\W+")))
-                .filter((key, word) -> !word.isEmpty())
-                .groupBy((key, word) -> word, Grouped.with(Serdes.String(), Serdes.String()))
-                .count(
-                        Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as(STORE_NAME)
-                            .withKeySerde(Serdes.String())
-                            .withValueSerde(Serdes.Long())
-                );
+            .flatMapValues(value -> Arrays.asList(value.toLowerCase().split("\\W+")))
+            .filter((key, word) -> !word.isEmpty())
+            .groupBy((key, word) -> word, Grouped.with(Serdes.String(), Serdes.String()))
+            .count(
+                Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as(STORE_NAME)
+                    .withKeySerde(Serdes.String())
+                    .withValueSerde(Serdes.Long())
+            );
 
         wordCounts
-                .toStream()
-                .to(OUTPUT_TOPIC, Produced.with(Serdes.String(), Serdes.Long()));
+            .toStream()
+            .to(OUTPUT_TOPIC, Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams streams = new KafkaStreams(builder.build(), props);
         streams.start();
