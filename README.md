@@ -1,7 +1,9 @@
 # GoodLabs Studio · Advanced KStreams Workshop Demos
 
+<img src="./assets/goodlabs-studio-logo-bl.png" height=50 />
+
+
 > Practical Kafka Streams examples to accompany the Advanced KStreams Workshop by [GoodLabs Studio](https://goodlabs.studio)
-> <img src="./assets/goodlabs-studio-logo-bl.png" align="right" height=50 />
 
 ## Table of Contents
 
