@@ -7,10 +7,6 @@ We'll be exposing our metrics through Grafana dashboards.
 
 ## Steps
 
-If you're coming from a previous demo, make sure to delete all containers and volumes from your previous experiments.
-This will keep each demo self-contained.
-Don't worry, none of the demos rely on the work we did in a previous demo.
-
 ### Create the Grafana service
 
 We want to monitor our metrics in a nice dashboard.
@@ -276,3 +272,11 @@ Special thanks to [LGouelle](https://github.com/LGouellec) and [Monitoring Rocks
 Feel free to have a look at that repository for more information.
 
 You can also find more JMX monitoring guidance [here](https://github.com/confluentinc/jmx-monitoring-stacks).
+
+### Cleanup
+
+Finally, before moving on, let's clean up the containers and volumes by running
+```bash
+docker compose down -v
+```
+This will stop and remove all our demo's containers and also remove any named or unnamed volumes.

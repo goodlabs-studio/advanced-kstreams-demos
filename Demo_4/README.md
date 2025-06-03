@@ -8,10 +8,6 @@ The purpose of this demo is to explore message deduplication logic.
 
 ## Steps
 
-If you're coming from a previous demo, make sure to delete all containers and volumes from your previous experiments.
-This will keep each demo self-contained.
-Don't worry, none of the demos rely on the work we did in a previous demo.
-
 ### Run the services
 
 First, run the services by running
@@ -196,7 +192,7 @@ docker rmi demo_4-order-processor
 
 Next, let's rebuild the image with our new code and run the new container by running
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Testing the results
@@ -220,3 +216,11 @@ docker exec -it demo_4-order-processor-1 java -cp app.jar studio.goodlabs.DemoMe
 
 If all goes well, you should see no output on the output topic.
 Feel free to send a few more messages to verify.
+
+### Cleanup
+
+Finally, before moving on, let's clean up the containers and volumes by running
+```bash
+docker compose down -v
+```
+This will stop and remove all our demo's containers and also remove any named or unnamed volumes.
