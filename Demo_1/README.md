@@ -35,7 +35,7 @@ Because of this, you'll use the script `print_latest_rocks_db_options.sh` conven
 > NOTE 2: Remember that each task will get its own state store, so you will see configurations per task (with folders named 1_0, 1_1, 1_2, etc.) within the state directory.
 > The script prints out the configurations for each task, which is why you'll generally see it print out more than one set of configurations.
 
-To see the latest configurations automatically, run
+To see the latest configurations automatically, wait for the streams application to initialize, then run
 ```bash
 docker exec streams /app/resources/print_latest_rocksdb_options.sh
 ```
@@ -43,8 +43,10 @@ or in a Windows environment you may have to run it as
 ```bash
 docker exec streams //app/resources/print_latest_rocksdb_options.sh
 ```
+If you don't see any configurations appear, then you may not have waited long enough for the streams application to initialize.
+Wait 15-30 seconds and try again.
 
-If you'd like to search for a specific option, feel free to append `| grep [your_config_name_here]` or output the result to a file by appending `> my_file_name.txt`.
+Once you've seen all the configurations, if you'd like to search for a specific option, feel free to append `| grep [your_config_name_here]` or output the result to a file by appending `> my_file_name.txt`.
 For example, run
 ```bash
 docker exec streams /app/resources/print_latest_rocksdb_options.sh | grep compaction_style
@@ -68,7 +70,7 @@ import org.rocksdb.RocksDB;
 import java.util.Map;
 ```
 
-Next, create a class called `OptimizedRocksDbConfig` that implements the interface
+Next, create a class called `OptimizedRocksDbConfig` within the `WordCountStreamApp` class that implements the interface
 ```java
 public static class OptimizedRocksDBConfig implements RocksDBConfigSetter {
     // We'll put our overrides here
@@ -144,7 +146,7 @@ docker rmi demo_1-streams
 
 Next, let's rebuild the image with our new code and run the new container by running
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 If all goes well, the docker image will build and the new container will now be running.
@@ -161,8 +163,10 @@ or in a Windows environment you may have to run it as
 ```bash
 docker exec streams //app/resources/print_latest_rocksdb_options.sh
 ```
+If you still see the old configuration, make sure you've waited long enough for the streams application to restart.
+Wait 15-30 seconds and try again.
 
-If you'd like to search for a specific option, feel free to append `| grep [your_config_name_here]` or output the result to a file by appending `> my_file_name.txt`.
+Once you've seen all the configurations, if you'd like to search for a specific option, feel free to append `| grep [your_config_name_here]` or output the result to a file by appending `> my_file_name.txt`.
 For example, run
 ```bash
 docker exec streams /app/resources/print_latest_rocksdb_options.sh | grep compaction_style
