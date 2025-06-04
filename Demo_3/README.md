@@ -10,10 +10,6 @@ The purpose of this lab is to test join behaviours hands on and compare results 
 
 ## Steps
 
-If you're coming from a previous demo, make sure to delete all containers and volumes from your previous experiments.
-This will keep each demo self-contained.
-Don't worry, none of the demos rely on the work we did in a previous demo.
-
 ### Review your join behaviour
 
 It's critical for this demo that you have a good working knowledge of the behaviour of the various Kafka Streams joins.
@@ -83,3 +79,11 @@ Some questions I'd like you to explore:
 - Other than the latter not needing co-partitioning, how is a Stream-Table join different than a Stream-GlobalTable join? Do they behave differently when it comes to out-of-order messages? What impact could this have on a streaming application?
 - In a Stream-Stream join, is the windowing based on processing time (wallclock at the consumer), log-append time (when the message arrived at the broker), or the timestamp? What does this mean for out-of order messages?
 - When does a Table-Table join produce messages to its output topic in an inner join? Does it behave like a Stream-Stream inner join? If not, how is it different? What is the impact of out-of-order messages on a Table-Table join, or a Table in general?
+
+### Cleanup
+
+Finally, before moving on, let's clean up the containers and volumes by running
+```bash
+docker compose down -v
+```
+This will stop and remove all our demo's containers and also remove any named or unnamed volumes.

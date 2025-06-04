@@ -14,6 +14,8 @@ COPY --from=builder /workspace/target/kstreams-wordcount-1.0-SNAPSHOT.jar app.ja
 COPY --from=builder /workspace/target/classes/logback.xml resources/logback.xml
 COPY --from=builder /workspace/target/classes/print_latest_rocksdb_options.sh resources/print_latest_rocksdb_options.sh
 
+RUN chmod +x resources/print_latest_rocksdb_options.sh
+
 EXPOSE 7071
 
 ENTRYPOINT java $JAVA_OPTS -Dlogback.configurationFile="/app/resources/logback.xml" -cp /app/app.jar studio.goodlabs.WordCountStreamApp

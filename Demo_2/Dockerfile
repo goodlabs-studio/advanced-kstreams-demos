@@ -15,4 +15,5 @@ COPY --from=builder /workspace/target/classes/logback.xml resources/logback.xml
 
 EXPOSE 7071
 
-ENTRYPOINT java $JAVA_OPTS -Dlogback.configurationFile="/app/resources/logback.xml" -cp /app/app.jar studio.goodlabs.WordCountStreamApp
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dlogback.configurationFile=/app/resources/logback.xml -cp /app/app.jar \"$@\"", "--"]
+CMD ["studio.goodlabs.WordCountStreamApp"]

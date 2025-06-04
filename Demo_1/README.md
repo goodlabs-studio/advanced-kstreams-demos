@@ -6,18 +6,18 @@ The purpose of this demo is to modify a simple streams application to edit the R
 
 ## Steps
 
-If you're coming from a previous demo, make sure to delete all containers and volumes from your previous experiments.
-This will keep each demo self-contained.
-Don't worry, none of the demos rely on the work we did in a previous demo.
-
 ### Run the WordCountStreamApp application
 
 The `WordCountStreamApp` is a simple streams application that consumes from a topic called `output-topic` and counts the number of times a given word has appeared.
 
 Run the Kafka services and demo stream using
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
+
+> NOTE: Some people may be more used to`docker-compose`, which is the v1 API.\
+> The v2 version uses `docker compose` without the dash.
+> On some environments, you may have to use the v1 API, but the version without the dash should be preferred as v1 is deprecated.
 
 Open [http://localhost:9021](http://localhost:9021) in your browser and test out the application:
 1. In one tab, navigate to the cluster->Topics->output-topic->Messages so you can monitor output.
@@ -35,19 +35,21 @@ Because of this, you'll use the script `print_latest_rocks_db_options.sh` conven
 > NOTE 2: Remember that each task will get its own state store, so you will see configurations per task (with folders named 1_0, 1_1, 1_2, etc.) within the state directory.
 > The script prints out the configurations for each task, which is why you'll generally see it print out more than one set of configurations.
 
-To see the latest configurations automatically, run
+To see the latest configurations automatically, wait for the streams application to initialize, then run
 ```bash
-docker exec demo_1-streams-1 /app/resources/print_latest_rocksdb_options.sh
+docker exec streams /app/resources/print_latest_rocksdb_options.sh
 ```
 or in a Windows environment you may have to run it as
 ```bash
-docker exec demo_1-streams-1 //app/resources/print_latest_rocksdb_options.sh
+docker exec streams //app/resources/print_latest_rocksdb_options.sh
 ```
+If you don't see any configurations appear, then you may not have waited long enough for the streams application to initialize.
+Wait 15-30 seconds and try again.
 
-If you'd like to search for a specific option, feel free to append `| grep [your_config_name_here]` or output the result to a file by appending `> my_file_name.txt`.
+Once you've seen all the configurations, if you'd like to search for a specific option, feel free to append `| grep [your_config_name_here]` or output the result to a file by appending `> my_file_name.txt`.
 For example, run
 ```bash
-docker exec demo_1-streams-1 /app/resources/print_latest_rocksdb_options.sh | grep compaction_style
+docker exec streams /app/resources/print_latest_rocksdb_options.sh | grep compaction_style
 ```
 to verify the compaction style RocksDB is using. Does it match what you expected?
 
@@ -68,7 +70,7 @@ import org.rocksdb.RocksDB;
 import java.util.Map;
 ```
 
-Next, create a class called `OptimizedRocksDbConfig` that implements the interface
+Next, create a class called `OptimizedRocksDbConfig` within the `WordCountStreamApp` class that implements the interface
 ```java
 public static class OptimizedRocksDBConfig implements RocksDBConfigSetter {
     // We'll put our overrides here
@@ -132,8 +134,8 @@ props.put(
 
 Let's stop and delete the container by running
 ```bash
-docker stop demo_1-streams-1
-docker rm demo_1-streams-1
+docker stop streams
+docker rm streams
 ```
 in the terminal.
 
@@ -144,7 +146,7 @@ docker rmi demo_1-streams
 
 Next, let's rebuild the image with our new code and run the new container by running
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 If all goes well, the docker image will build and the new container will now be running.
@@ -155,20 +157,30 @@ Now that the new container is running, let's make sure our configurations have c
 
 Once again, to see the latest configurations automatically, run
 ```bash
-docker exec demo_1-streams-1 /app/resources/print_latest_rocksdb_options.sh
+docker exec streams /app/resources/print_latest_rocksdb_options.sh
 ```
 or in a Windows environment you may have to run it as
 ```bash
-docker exec demo_1-streams-1 //app/resources/print_latest_rocksdb_options.sh
+docker exec streams //app/resources/print_latest_rocksdb_options.sh
 ```
+If you still see the old configuration, make sure you've waited long enough for the streams application to restart.
+Wait 15-30 seconds and try again.
 
-If you'd like to search for a specific option, feel free to append `| grep [your_config_name_here]` or output the result to a file by appending `> my_file_name.txt`.
+Once you've seen all the configurations, if you'd like to search for a specific option, feel free to append `| grep [your_config_name_here]` or output the result to a file by appending `> my_file_name.txt`.
 For example, run
 ```bash
-docker exec demo_1-streams-1 /app/resources/print_latest_rocksdb_options.sh | grep compaction_style
+docker exec streams /app/resources/print_latest_rocksdb_options.sh | grep compaction_style
 ```
 to verify the compaction style RocksDB is using.
 
 Make sure all of the configurations match the ones you changed.
 
-If all configurations match the optimizations you set, then the demo is complete!
+If all configurations match the optimizations you set, then the demo is successful!
+
+### Cleanup
+
+Finally, before moving on, let's clean up the containers and volumes by running
+```bash
+docker compose down -v
+```
+This will stop and remove all our demo's containers and also remove any named or unnamed volumes.
