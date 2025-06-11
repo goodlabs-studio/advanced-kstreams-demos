@@ -3,8 +3,6 @@ package studio.goodlabs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.DescribeTopicsResult;
 import org.apache.kafka.clients.admin.TopicDescription;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.StreamsConfig;
 
 import java.time.Duration;
 import java.util.List;
@@ -19,7 +17,7 @@ public class DemoStreamsUtils {
                 while (true) {
                     try {
                         DescribeTopicsResult desc = admin.describeTopics(List.of(topic));
-                        Map<String, TopicDescription> all = desc.all().get();
+                        Map<String, TopicDescription> all = desc.allTopicNames().get();
                         if (all.containsKey(topic)) {
                             System.out.println("Topic " + topic + " exists.");
                             break;

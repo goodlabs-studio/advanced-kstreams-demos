@@ -8,10 +8,11 @@
     <groupId>studio.goodlabs</groupId>
     <artifactId>order-processor</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Order Processor Demo</name>
+    <name>Demo 4 - Kafka Streams Reconciliation Demo</name>
+
     <properties>
-        <java.version>17</java.version>
-        <kafka.streams.version>3.9.1</kafka.streams.version>
+        <java.version>11</java.version>
+        <kafka.version>3.2.3</kafka.version>
         <rocksdbjni.version>10.2.1</rocksdbjni.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -21,12 +22,12 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-            <version>${kafka.streams.version}</version>
+            <version>${kafka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>
-            <version>${kafka.streams.version}</version>
+            <version>${kafka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.rocksdb</groupId>

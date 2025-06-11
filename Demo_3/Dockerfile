@@ -1,4 +1,4 @@
-FROM maven:3.9.2-eclipse-temurin-17 AS builder
+FROM maven:3.9.2-eclipse-temurin-11 AS builder
 WORKDIR /workspace
 
 COPY pom.xml .
@@ -6,7 +6,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests \
  && mvn dependency:copy-dependencies -DoutputDirectory=target/dependency -DincludeScope=runtime
 
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:11-jre
 WORKDIR /app
 
 COPY --from=builder /workspace/target/kstreams-joins-examples-1.0-SNAPSHOT.jar app.jar

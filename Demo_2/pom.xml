@@ -8,9 +8,10 @@
     <groupId>studio.goodlabs</groupId>
     <artifactId>kstreams-wordcount</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Kafka Streams WordCount Demo</name>
+    <name>Demo 2 - Kafka Streams Observability Demo</name>
+
     <properties>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
         <kafka.streams.version>3.9.1</kafka.streams.version>
         <rocksdbjni.version>10.2.1</rocksdbjni.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

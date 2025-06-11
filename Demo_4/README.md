@@ -8,11 +8,16 @@ The purpose of this demo is to explore message deduplication logic.
 
 ## Steps
 
+### Ensure instructions are readable
+
+If these instructions appear in Markdown, switch to Preview mode in your editor.
+In Visual Studio Code, you can do this by right-clicking on the README's tab and selecting Open Preview.
+
 ### Run the services
 
 First, run the services by running
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 in the terminal from this directory.
 
@@ -34,7 +39,7 @@ Next, navigate to cluster->Topics->stream-stream-address-topic->Messages and sen
 
 To send a message using the application, run
 ```bash
-docker exec -it demo_4-order-processor-1 java -cp app.jar studio.goodlabs.DemoMessageProducer broker:29092 raw-order-topic CUSTOMER-ID ORDER
+docker exec -it order-processor java -cp app.jar studio.goodlabs.DemoMessageProducer broker:29092 raw-order-topic CUSTOMER-ID ORDER
 ```
 
 Now that you've sent a duplicate message, reflect on the fact that this is an order keyed by the customer ID. What impact might it have downstream?
@@ -88,29 +93,29 @@ Now we need to implement some lifecycle methods for initialization, maintenance,
 Add
 ```java
 @Override
-    @SuppressWarnings("unchecked")
-    public void init(ProcessorContext context) {
-        this.context = context;
-        this.store = (KeyValueStore<String, Long>) context.getStateStore(storeName);
-        // Schedule cleanup every 30 seconds
-        this.context.schedule(Duration.ofSeconds(30), PunctuationType.WALL_CLOCK_TIME, this::cleanup);
-    }
+@SuppressWarnings("unchecked")
+public void init(ProcessorContext context) {
+    this.context = context;
+    this.store = (KeyValueStore<String, Long>) context.getStateStore(storeName);
+    // Schedule cleanup every 30 seconds
+    this.context.schedule(Duration.ofSeconds(30), PunctuationType.WALL_CLOCK_TIME, this::cleanup);
+}
 
-    private void cleanup(long timestamp) {
-        try (KeyValueIterator<String, Long> iter = store.all()) {
-            while (iter.hasNext()) {
-                KeyValue<String, Long> entry = iter.next();
-                if (timestamp - entry.value > ttlMs) {
-                    store.delete(entry.key);
-                }
+private void cleanup(long timestamp) {
+    try (KeyValueIterator<String, Long> iter = store.all()) {
+        while (iter.hasNext()) {
+            KeyValue<String, Long> entry = iter.next();
+            if (timestamp - entry.value > ttlMs) {
+                store.delete(entry.key);
             }
         }
     }
+}
 
-    @Override
-    public void close() {
-        // no need to handle
-    }
+@Override
+public void close() {
+    // no need to handle
+}
 ```
 to the class.
 There's no need to add any cleanup to our close, since we haven't instantiated anything in our constructor that requires manual cleanup.
@@ -134,6 +139,9 @@ to the class.
 The transform checks to see if the key has been seen within the TTL.
 If it has, it's a duplicate and the method will return null.
 
+> NOTE: In more recent versions of Kafka Streams, all transformers have been deprecated in favour of processors.
+> This demo uses transformers due to the continued widespread usage of pre-3.3.x Kafka.
+
 ### Wire in the custom transform
 
 Open the `OrderProcessor.java` file.
@@ -156,14 +164,14 @@ private static final long STORE_TTL_MS = Duration.ofMinutes(1).toMillis();
 to the `OrderProcessorApp` class.
 
 We now need to build our state store, which will be used by our custom transformer.
-After instantiating the stream builder, create the state store builder and configure the state store.
+After instantiating the stream builder in the `main` method, create the state store builder and configure the state store.
 ```java
 StoreBuilder<KeyValueStore<String, Long>> seenStoreBuilder =
-Stores.keyValueStoreBuilder(
-    Stores.persistentKeyValueStore(STORE_NAME),
-    Serdes.String(),
-    Serdes.Long()
-);
+    Stores.keyValueStoreBuilder(
+        Stores.persistentKeyValueStore(STORE_NAME),
+        Serdes.String(),
+        Serdes.Long()
+    );
 builder.addStateStore(seenStoreBuilder);
 ```
 
@@ -180,19 +188,19 @@ Finally, add the transform to the stream by adding these calls before sending to
 
 Let's stop and delete the container by running
 ```bash
-docker stop demo_4-order-processor-1
-docker rm demo_4-order-processor-1
+docker stop order-processor
+docker rm order-processor
 ```
 in the terminal.
 
 Next, let's delete the old image by running
 ```bash
-docker rmi demo_4-order-processor
+docker rmi demo_4_order-processor
 ```
 
 Next, let's rebuild the image with our new code and run the new container by running
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 ### Testing the results
@@ -211,7 +219,7 @@ Next, navigate to cluster->Topics->stream-stream-address-topic->Messages and sen
 
 To send a message using the application, run
 ```bash
-docker exec -it demo_4-order-processor-1 java -cp app.jar studio.goodlabs.DemoMessageProducer broker:29092 raw-order-topic CUSTOMER-ID ORDER
+docker exec -it order-processor java -cp app.jar studio.goodlabs.DemoMessageProducer broker:29092 raw-order-topic CUSTOMER-ID ORDER
 ```
 
 If all goes well, you should see no output on the output topic.
@@ -221,6 +229,6 @@ Feel free to send a few more messages to verify.
 
 Finally, before moving on, let's clean up the containers and volumes by running
 ```bash
-docker compose down -v
+docker-compose down -v
 ```
 This will stop and remove all our demo's containers and also remove any named or unnamed volumes.

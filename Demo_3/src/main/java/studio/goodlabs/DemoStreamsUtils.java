@@ -28,7 +28,7 @@ public class DemoStreamsUtils {
                 while (true) {
                     try {
                         DescribeTopicsResult desc = admin.describeTopics(List.of(topic));
-                        Map<String, TopicDescription> all = desc.all().get();
+                        Map<String, TopicDescription> all = desc.allTopicNames().get();
                         if (all.containsKey(topic)) {
                             System.out.println("Topic " + topic + " exists.");
                             break;

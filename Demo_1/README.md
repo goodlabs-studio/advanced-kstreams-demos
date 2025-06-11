@@ -6,23 +6,27 @@ The purpose of this demo is to modify a simple streams application to edit the R
 
 ## Steps
 
+### Ensure instructions are readable
+
+If these instructions appear in Markdown, switch to Preview mode in your editor.
+In Visual Studio Code, you can do this by right-clicking on the README's tab and selecting Open Preview.
+
 ### Run the WordCountStreamApp application
 
 The `WordCountStreamApp` is a simple streams application that consumes from a topic called `output-topic` and counts the number of times a given word has appeared.
 
 Run the Kafka services and demo stream using
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
-
-> NOTE: Some people may be more used to`docker-compose`, which is the v1 API.\
-> The v2 version uses `docker compose` without the dash.
-> On some environments, you may have to use the v1 API, but the version without the dash should be preferred as v1 is deprecated.
 
 Open [http://localhost:9021](http://localhost:9021) in your browser and test out the application:
 1. In one tab, navigate to the cluster->Topics->output-topic->Messages so you can monitor output.
 2. In another tab, navigate to cluster->Topics->input-topic->Messages and click "Produce a new message"
 3. In the "value" textbox, replace the JSON with a word in quotations (e.g. "firetruck").
+
+> NOTE: It may take a few seconds for Control Center to start up.
+> If you don't see it at first, wait a few moments and try again.
 
 ### Verify the RocksDB settings
 
@@ -58,14 +62,13 @@ to verify the compaction style RocksDB is using. Does it match what you expected
 Unfortunately, modifying the RocksDB configurations is not as simple as just creating and passing an instance of `Properties`.
 We need to create a custom class that implements the `RocksDBConfigSetter` interface and then pass that class to our streams configs.
 
-First, open `WordCountStreamApp.java` in your editor.
+First, open `src/main/java/studio/goodlabs/WordCountStreamApp.java` in your editor.
 
 Let's add the imports for the types we'll need
 ```java
 import org.apache.kafka.streams.state.RocksDBConfigSetter;
 import org.rocksdb.Options;
 import org.rocksdb.CompactionStyle;
-import org.rocksdb.InfoLogLevel;
 import org.rocksdb.RocksDB;
 import java.util.Map;
 ```
@@ -108,17 +111,11 @@ Let's also tweak some settings related to CPU load and disk IO to reduce the str
 
 Let's set the configurations by filling our `setConfig` method as follows.
 ```java
-@Override
-public void setConfig(final String storeName, final Options options, final Map<String, Object> configs) {
-    // Lower space amplification
-    options.setCompactionStyle(CompactionStyle.LEVEL);
-    // Prevent OOM: smaller memtables
-    options.setWriteBufferSize(8 * 1024 * 1024); // 8 MB
-    options.setMaxWriteBufferNumber(2); // 2 buffers
-    // Limit threads to reduce I/O/CPU contention
-    options.setMaxBackgroundCompactions(1); // 1 compaction thread
-    options.setMaxBackgroundFlushes(1); // 1 flush thread
-}
+// Lower space amplification
+options.setCompactionStyle(CompactionStyle.LEVEL);
+// Prevent OOM: smaller memtables
+options.setWriteBufferSize(8 * 1024 * 1024); // 8 MB
+options.setMaxWriteBufferNumber(2); // 2 buffers
 ```
 
 Finally, let's tie it all together by setting the RocksDB configurations to be provided by our custom class by adding
@@ -141,12 +138,12 @@ in the terminal.
 
 Next, let's delete the old image by running
 ```bash
-docker rmi demo_1-streams
+docker rmi demo_1_streams
 ```
 
 Next, let's rebuild the image with our new code and run the new container by running
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 If all goes well, the docker image will build and the new container will now be running.
@@ -181,6 +178,6 @@ If all configurations match the optimizations you set, then the demo is successf
 
 Finally, before moving on, let's clean up the containers and volumes by running
 ```bash
-docker compose down -v
+docker-compose down -v
 ```
 This will stop and remove all our demo's containers and also remove any named or unnamed volumes.
