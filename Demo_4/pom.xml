@@ -8,7 +8,8 @@
     <groupId>studio.goodlabs</groupId>
     <artifactId>order-processor</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Order Processor Demo</name>
+    <name>Kafka Streams Reconciliation Demo</name>
+
     <properties>
         <java.version>11</java.version>
         <kafka.streams.version>3.9.1</kafka.streams.version>

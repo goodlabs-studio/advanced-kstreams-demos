@@ -6,6 +6,7 @@
     <groupId>studio.goodlabs</groupId>
     <artifactId>kstreams-joins-examples</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>Kafka Streams Join Behaviour Demo</name>
 
     <properties>
         <maven.compiler.release>11</maven.compiler.release>
