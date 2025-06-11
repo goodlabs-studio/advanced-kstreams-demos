@@ -8,7 +8,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>11</maven.compiler.release>
         <kafka.streams.version>3.5.2</kafka.streams.version>
         <jackson.version>2.15.2</jackson.version>
         <slf4j.version>1.7.36</slf4j.version>

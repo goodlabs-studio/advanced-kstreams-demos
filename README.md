@@ -29,7 +29,7 @@ Use these demos to:
 - **Git ≥ 2.30.0**: `https://git-scm.com/downloads`  
 - **Docker Engine ≥ 20.10.0** & **Docker Compose ≥ 1.29.0** (or **Docker Desktop**)  
 - **Visual Studio Code** (or any IDE/editor of your choice)
-- (Optional, for debugging) **Java 17 (JDK)** installed and on your `PATH`
+- (Optional, for debugging) **Java 11 (JDK)** installed and on your `PATH`
 
 ## Prerequisites
 
