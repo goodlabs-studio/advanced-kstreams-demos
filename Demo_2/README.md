@@ -7,6 +7,24 @@ We'll be exposing our metrics through Grafana dashboards.
 
 ## Steps
 
+### Ensure instructions are readable
+
+If these instructions appear in Markdown, switch to Preview mode in your editor.
+In Visual Studio Code, you can do this by right-clicking on the README's tab and selecting Open Preview.
+
+### Run the services
+
+First, we need to run all our containers.
+We can do this by simply running
+```bash
+docker compose up  -d
+```
+in our terminal from this demo directory.
+
+Take a moment to look at the various topics and metrics available in Confluent Control Center to see what this streams application is doing.
+Navigate to [http://localhost:9021](http://localhost:9021).
+You may have to wait a few moments for the Control Center service to start up and begin listening.
+
 ### Create the Grafana service
 
 We want to monitor our metrics in a nice dashboard.
@@ -26,7 +44,7 @@ grafana:
 ```
 
 > NOTE: YAML files are sensitive to indentation.
-> Make sure that grafana is directly under the services and not indended below another service.
+> Make sure that grafana is directly under the services and not indented below another service.
 > If this happens, you'll get an error.
 
 ### Add JMX exporter binary and configurations
@@ -241,7 +259,7 @@ Now that we have all our changes in place, we're ready to update our `broker` an
 
 Since we made no code changes that require rebuilding our image, we simply need to run
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 from the terminal.
 
@@ -250,7 +268,7 @@ If all goes well, then the broker and streams containers will be modified, and o
 ### Checking the dashboards
 
 Let's take a moment to check our work.
-Just because the call to `docker compose up -d` worked doesn't mean our metrics are being properly recorded.
+Just because the call to `docker-compose up -d` worked doesn't mean our metrics are being properly recorded.
 
 Let's open Grafana by navigating to: [http://localhost:3000](http://localhost:3000)
 
@@ -262,9 +280,18 @@ Press "skip" on the next screen if you don't want to bother setting a new passwo
 Next, click on the spyglass to search through the various dashboards.
 
 Navigate the "Kafka Overview", "Kafka Streams", and "Kafka Streams - RocksDB Metrics" dashboards.
-If you see the graphs populated with information, then you've successfully completed the demo.
+You might not see the graphs populated right away. Make sure to wait a few seconds for the information to show up.
+After waiting up to a minute, if you see the graphs populated with information, then you've successfully completed the demo.
 
 Take a few minutes to look through and understand the graphs.
+
+### Cleanup
+
+Finally, before moving on, let's clean up the containers and volumes by running
+```bash
+docker-compose down -v
+```
+This will stop and remove all our demo's containers and also remove any named or unnamed volumes.
 
 ## Special thanks
 
@@ -272,11 +299,3 @@ Special thanks to [LGouelle](https://github.com/LGouellec) and [Monitoring Rocks
 Feel free to have a look at that repository for more information.
 
 You can also find more JMX monitoring guidance [here](https://github.com/confluentinc/jmx-monitoring-stacks).
-
-### Cleanup
-
-Finally, before moving on, let's clean up the containers and volumes by running
-```bash
-docker compose down -v
-```
-This will stop and remove all our demo's containers and also remove any named or unnamed volumes.

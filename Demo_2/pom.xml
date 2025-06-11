@@ -8,7 +8,7 @@
     <groupId>studio.goodlabs</groupId>
     <artifactId>kstreams-wordcount</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Kafka Streams Observability Demo</name>
+    <name>Demo 2 - Kafka Streams Observability Demo</name>
 
     <properties>
         <java.version>11</java.version>

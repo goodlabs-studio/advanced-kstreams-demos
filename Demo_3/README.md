@@ -10,6 +10,11 @@ The purpose of this lab is to test join behaviours hands on and compare results 
 
 ## Steps
 
+### Ensure instructions are readable
+
+If these instructions appear in Markdown, switch to Preview mode in your editor.
+In Visual Studio Code, you can do this by right-clicking on the README's tab and selecting Open Preview.
+
 ### Review your join behaviour
 
 It's critical for this demo that you have a good working knowledge of the behaviour of the various Kafka Streams joins.
@@ -23,7 +28,7 @@ Choosing the wrong type of join for a given application can have severe conseque
 First, we need to run all our containers.
 We can do this by simply running
 ```bash
-docker compose up  -d
+docker-compose up  -d
 ```
 in our terminal from this demo directory.
 
@@ -84,6 +89,6 @@ Some questions I'd like you to explore:
 
 Finally, before moving on, let's clean up the containers and volumes by running
 ```bash
-docker compose down -v
+docker-compose down -v
 ```
 This will stop and remove all our demo's containers and also remove any named or unnamed volumes.
