@@ -45,7 +45,7 @@ To benefit fully from these demos, you'll need:
 
 1. **Clone the repository**  
    ```bash
-   git clone https://github.com/goodlabs-studio/kstreams-workshop-demos.git
+   git clone https://github.com/goodlabs-studio/advanced-kstreams-demos.git
    cd kstreams-workshop-demos
    ```
 2. **Navigate to a demo folder**
